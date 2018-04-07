@@ -60,7 +60,6 @@ function reset() {
 
 reset();
 
-
 function clickableGrid(rows, cols, callback) {
     var i = 0;
     var grid = document.createElement('table');
@@ -87,18 +86,17 @@ function simul() {
     for (let ink = 0; ink < people.length; ink++) {
         let r = people[ink].row;
         let c = people[ink].col;
-        //console.log(paths);
         if (Math.random() < panic) { //panic mode
+            console.log("SZALONY");
             let aval_mv = [];
             for (let i = -1; i < 2; i++)
                 for (let j = -1; j < 2; j++)
                     if (i != j && paths[r + i][c + j] < wall && !contains(people, new Position(r + i, c + j)))
                         aval_mv.push(new Position(r + i, c + j));
-            //console.log(aval_mv);
             if (aval_mv.length > 0) {
                 let i = Math.floor(Math.random() * aval_mv.length);
-                console.log(i + " " + aval_mv.length);
-                console.log(people);
+                // console.log(i + " " + aval_mv.length);
+                // console.log(people);
                 people[ink] = aval_mv[i];
                 ccc(r, c, '');
                 if (aval_mv[i].row != exit.row || aval_mv[i].col != exit.col)
@@ -107,10 +105,26 @@ function simul() {
                     delete_person(aval_mv[i].row, aval_mv[i].col);
             }
         } else { //reasonable mode
-
+            console.log("NORMALNY");
+            let mv = new Position(r, c);
+            let val = paths[r][c];
+            for (let i = -1; i < 2; i++)
+                for (let j = -1; j < 2; j++)
+                    if (i != j && paths[r + i][c + j] < val && !contains(people, new Position(r + i, c + j))) {
+                        val = paths[r + i][c + j];
+                        mv = new Position(r + i, c + j);
+                    }
+            if (val < paths[r][c]) {
+                ccc(r, c, '');
+                if (mv.row != exit.row || mv.col != exit.col){
+                    ccc(mv.row, mv.col, 'person');
+                    people[ink]= new Position(mv.row, mv.col);
+                }else
+                    delete_person(r, c);
+            }
         }
     }
-    setTimeout(simul, 500);
+    setTimeout(simul, 1000);
 }
 
 function fill_weights() {
