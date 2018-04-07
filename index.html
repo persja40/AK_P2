@@ -53,7 +53,7 @@
     <header>
         <div class="container">
             <div class="fixed">
-                <button onclick="if(pause){pause= false;panic= document.getElementById('panic').value;}">Start</button>
+                <button onclick="if(pause){pause= false;panic= document.getElementById('panic').value;fill_weights();simul()}">Start</button>
                 <button onclick="pause= true">Pause</button>
                 <button onclick="pause= true;setTimeout(reset,1000)">Reset</button>
                 <br>Panic:

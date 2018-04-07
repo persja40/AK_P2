@@ -1,10 +1,9 @@
 const MAX = 25;
 const wall = Number.MAX_SAFE_INTEGER;
-const person = Number.MAX_SAFE_INTEGER - 1;
 const empty_place = 0;
-var people = [];
+var people;
 var pause = true;
-var paths = [];
+var paths;
 var panic;
 var grid;
 var exit;
@@ -12,6 +11,8 @@ var exit;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function reset() {
+    people = [];
+    paths = [];
     for (let i = 0; i < MAX; i++) {
         paths[i] = [];
         for (let j = 0; j < MAX; j++) {
@@ -23,7 +24,6 @@ function reset() {
     }
     let first_time = (grid == undefined) ? true : false;
     grid = clickableGrid(MAX, MAX, function (el, row, col, i) {
-        // console.log(paths);
         if (pause) {
             if (row == 0 || row == MAX - 1 || col == 0 || col == MAX - 1) {
                 black_boarder();
@@ -32,7 +32,7 @@ function reset() {
                 exit = new Position(row, col);
             } else switch (el.className) {
                 case 'wall':
-                    paths[row][col] = person;
+                    paths[row][col] = empty_place;
                     el.className = 'person';
                     people.push(new Position(row, col));
                     break;
@@ -84,13 +84,38 @@ function clickableGrid(rows, cols, callback) {
 function simul() {
     if (pause)
         return;
+    for (let ink = 0; ink < people.length; ink++) {
+        let r = people[ink].row;
+        let c = people[ink].col;
+        //console.log(paths);
+        if (Math.random() < panic) { //panic mode
+            let aval_mv = [];
+            for (let i = -1; i < 2; i++)
+                for (let j = -1; j < 2; j++)
+                    if (i != j && paths[r + i][c + j] < wall && !contains(people, new Position(r + i, c + j)))
+                        aval_mv.push(new Position(r + i, c + j));
+            //console.log(aval_mv);
+            if (aval_mv.length > 0) {
+                let i = Math.floor(Math.random() * aval_mv.length);
+                console.log(i + " " + aval_mv.length);
+                console.log(people);
+                people[ink] = aval_mv[i];
+                ccc(r, c, '');
+                if (aval_mv[i].row != exit.row || aval_mv[i].col != exit.col)
+                    ccc(aval_mv[i].row, aval_mv[i].col, 'person');
+                else
+                    delete_person(aval_mv[i].row, aval_mv[i].col);
+            }
+        } else { //reasonable mode
+
+        }
+    }
     setTimeout(simul, 500);
 }
 
 function fill_weights() {
     let nextpos = [exit];
     write_weight(exit.row, exit.col, 0);
-    var i = 0;
     while (nextpos.length > 0) {
         let nxt = nextpos.shift();
         let basic = [[1, 1, 1], [1, 0, 1], [1, 1, 1]];
@@ -110,9 +135,6 @@ function fill_weights() {
             let tmp = [[1, 1, 0], [1, 0, 0], [1, 1, 0]];
             conj(basic, tmp);
         }
-        if (i == 0)
-            console.log(basic);
-        i++;
         for (let i = 0; i < 3; i++)
             for (let j = 0; j < 3; j++)
                 if (basic[i][j]) {
@@ -120,7 +142,7 @@ function fill_weights() {
                     let y = nxt.col + j - 1;
                     if (x == exit.row && y == exit.col)
                         continue;
-                    if ((paths[x][y] == 0 || paths[x][y] == person)) {
+                    if (paths[x][y] == 0) {
                         if (Math.sqrt(Math.pow(x - nxt.row, 2) + Math.pow(y - nxt.col, 2)) > 1)
                             paths[x][y] = paths[nxt.row][nxt.col] + 1.5;
                         else
