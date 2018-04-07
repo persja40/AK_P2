@@ -1,0 +1,26 @@
+6. Labirynt - ucieczka z pomieszczenia
+
+siatka kwadratowa - ściany na zewnątrz (obszar ograniczony) z jednym wyjściem
+	kratki mogą być przeszkodą lub człowiekiem
+	dany jest labirynt i ludzie wewnątrz
+	
+	od wyjścia w czasie nakładamy pole podłogowe
+	każde pole podłogowe na numer taki jak numer generacji w której zostało utworzone
+	rośnie kolejno 
+   323
+  32123
+	0
+	
+	po przekątnej +0.5
+	
+	"ludź" patrzy czy jest pole o niższym polu podlogowym żeby się na niego przemieścić
+	powyższa strategia powinna teoretycznie powinna doprowadzic go do wyjscia
+	ludzik nie moze przemiescic sie na pole z innym ludzikiem
+	
+	ściany mają wartość wyższą niż reszta pół podłogowych
+	parametr P-Panic - określa szansę że człowiek zrobi ruch niezgodny z zasadami (na pole z nienajniższą wartością)
+	
+	parametr kontrolny:
+	gęstość ludzików wewnątrz labiryntu i poziom paniki
+	czas opuszczenia labiryntu w zaleznosci od gestosci ludzików
+	
