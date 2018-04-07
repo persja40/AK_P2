@@ -56,7 +56,8 @@
                 <button onclick="if(pause){pause= false;panic= document.getElementById('panic').value;}">Start</button>
                 <button onclick="pause= true">Pause</button>
                 <button onclick="pause= true;setTimeout(reset,1000)">Reset</button>
-                <br>Panic: <input type="number" id="panic" min=0 max=100 value=10> [%]
+                <br>Panic:
+                <input type="number" id="panic" min=0 max=100 value=10> [%]
             </div>
             <div class="flex-item">
                 <canvas id="line-chart" width="1200" height="250" style="border:1px solid #d3d3d3;"></canvas>

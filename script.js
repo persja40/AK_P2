@@ -29,15 +29,17 @@ function reset() {
                 black_boarder();
                 ccc(row, col, '');
                 paths_boarder(row, col);
-                exit = [row, col];
+                exit = new Position(row, col);
             } else switch (el.className) {
                 case 'wall':
                     paths[row][col] = person;
                     el.className = 'person';
+                    people.push(new Position(row, col));
                     break;
                 case 'person':
                     paths[row][col] = empty_place;
                     el.className = '';
+                    delete_person(row, col);
                     break;
                 default:
                     paths[row][col] = wall;
@@ -85,20 +87,72 @@ function simul() {
     setTimeout(simul, 500);
 }
 
+function fill_weights() {
+    let nextpos = [exit];
+    write_weight(exit.row, exit.col, 0);
+    var i = 0;
+    while (nextpos.length > 0) {
+        let nxt = nextpos.shift();
+        let basic = [[1, 1, 1], [1, 0, 1], [1, 1, 1]];
+        if (nxt.row == 0) {
+            let tmp = [[0, 0, 0], [1, 0, 1], [1, 1, 1]];
+            conj(basic, tmp);
+        }
+        if (nxt.row == MAX - 1) {
+            tmp = [[1, 1, 1], [1, 0, 1], [0, 0, 0]];
+            conj(basic, tmp);
+        }
+        if (nxt.col == 0) {
+            tmp = [[0, 1, 1], [0, 0, 1], [0, 1, 1]];
+            conj(basic, tmp);
+        }
+        if (nxt.col == MAX - 1) {
+            let tmp = [[1, 1, 0], [1, 0, 0], [1, 1, 0]];
+            conj(basic, tmp);
+        }
+        if (i == 0)
+            console.log(basic);
+        i++;
+        for (let i = 0; i < 3; i++)
+            for (let j = 0; j < 3; j++)
+                if (basic[i][j]) {
+                    let x = nxt.row + i - 1;
+                    let y = nxt.col + j - 1;
+                    if (x == exit.row && y == exit.col)
+                        continue;
+                    if ((paths[x][y] == 0 || paths[x][y] == person)) {
+                        if (Math.sqrt(Math.pow(x - nxt.row, 2) + Math.pow(y - nxt.col, 2)) > 1)
+                            paths[x][y] = paths[nxt.row][nxt.col] + 1.5;
+                        else
+                            paths[x][y] = paths[nxt.row][nxt.col] + 1;
+                        write_weight(x, y, paths[x][y]);
+                        nextpos.push(new Position(x, y));
+                    }
+                }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function conj(m1, m2) {
+    for (let i = 0; i < 3; i++)
+        for (let j = 0; j < 3; j++)
+            m1[i][j] = m1[i][j] & m2[i][j];
+}
+
 function contains(arr, match) {
-    for (let i = 0; i < arr.length; i++) {
-        let eq = true;
-        for (let j = 0; j < arr[i].length; j++)
-            if (arr[i][j] != match[j]) {
-                eq = false;
-                break;
-            }
-        if (eq)
+    for (let i = 0; i < arr.length; i++)
+        if (arr[i].row == match.row && arr[i].col == match.col)
             return true;
-    }
+    return false;
+}
+
+function delete_person(r, c) {
+    for (let i = 0; i < people.length; i++)
+        if (people[i].row == r && people[i].col == c) {
+            people.splice(i, 1);
+            return true;
+        }
     return false;
 }
 
@@ -121,9 +175,18 @@ function paths_boarder(r, c) {
     paths[r][c] = empty_place;
 }
 
-
 //change cell class
 function ccc(r, c, cl) {
     let cell = document.getElementsByClassName('grid')[0].rows[r].cells[c];
     cell.className = cl;
+}
+
+function write_weight(r, c, w) {
+    let cell = document.getElementsByClassName('grid')[0].rows[r].cells[c];
+    cell.innerHTML = w;
+}
+
+function Position(r, c) {
+    this.row = r;
+    this.col = c;
 }
