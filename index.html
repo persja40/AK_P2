@@ -16,7 +16,7 @@
         }
 
         .flex-item {
-            width: 700px;
+            width: 1200px;
         }
 
         .grid {
@@ -55,7 +55,7 @@
             <div class="fixed">
                 <button onclick="if(pause){pause= false;panic= document.getElementById('panic').value*0.01;fill_weights();simul()}">Start</button>
                 <button onclick="pause= true">Pause</button>
-                <button onclick="pause= true;setTimeout(reset,1000)">Reset</button>
+                <button onclick="pause= true;setTimeout(reset,2000)">Reset</button>
                 <br>Panic:
                 <input type="number" id="panic" min=0 max=100 value=10> [%]
             </div>

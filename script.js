@@ -7,10 +7,12 @@ var paths;
 var panic;
 var grid;
 var exit;
+var chart;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function reset() {
+    initChart();
     people = [];
     paths = [];
     for (let i = 0; i < MAX; i++) {
@@ -79,7 +81,7 @@ function clickableGrid(rows, cols, callback) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+var indeks = 0;
 function simul() {
     if (pause)
         return;
@@ -116,14 +118,23 @@ function simul() {
                     }
             if (val < paths[r][c]) {
                 ccc(r, c, '');
-                if (mv.row != exit.row || mv.col != exit.col){
+                if (mv.row != exit.row || mv.col != exit.col) {
                     ccc(mv.row, mv.col, 'person');
-                    people[ink]= new Position(mv.row, mv.col);
-                }else
+                    people[ink] = new Position(mv.row, mv.col);
+                } else
                     delete_person(r, c);
             }
         }
     }
+    chart.data.labels.push(indeks);
+    indeks++;
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(people.length);
+    });
+    console.log(people.length);
+    chart.update();
+    if (people.length == 0)
+        pause = true;
     setTimeout(simul, 1000);
 }
 
@@ -225,4 +236,39 @@ function write_weight(r, c, w) {
 function Position(r, c) {
     this.row = r;
     this.col = c;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function initChart() {
+    chart = new Chart(document.getElementById("line-chart"), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                //label: "Africa",
+                borderColor: "#3e95cd",
+                fill: false
+            }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Ilość ewakuantów'
+            },
+            legend: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 20
+                    }
+                }]
+            }
+        }
+    });
 }
